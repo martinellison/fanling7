@@ -1,0 +1,57 @@
+%module(directors="1") ui
+%include "std_string.i"
+%include "std_vector.i"
+namespace std {
+ %template (stringVector) vector<string>;
+}
+%{
+ #include "interface.h"
+%}
+%feature("director") Error;
+#include <string>
+#include <vector>
+enum class Severity {ok, user, system};
+class Error {
+public:
+virtual ~Error() {}
+ virtual bool ok();
+ virtual Severity severity();
+ virtual std::string text();
+};
+%feature("director") Engine;
+class Engine {
+public:
+ virtual ~Engine();
+ virtual bool pageExists(const std::string& ident);
+ virtual Error* applyAction(const std::string ident, const std::string actionName,const int actionNumber);
+ virtual Error* createPage(const std::string newIdent,const std::string newType);
+ virtual Error* exportPages();
+ virtual void getInput();
+ virtual std::vector<std::string> getPageTypes();
+ virtual std::vector<std::string> getPages();
+ virtual void setConfig(const std::string& path);
+ virtual void setIndir(const std::string& dir);
+ virtual void setOutdir(const std::string& dir);
+ virtual void setMetadir(const std::string& dir);
+ virtual void setVerbose(const int verbosity);
+ virtual void init();
+ virtual void readOptions();
+ virtual std::string getPageOutURL(const std::string& ident);
+ virtual std::string identFromURL(const std::string& url);
+ virtual std::string getPageYAMLDetail(const std::string& ident);
+ virtual Error* setPageDetailAndProcess(const std::string& ident, const std::string& text);
+ virtual bool canEditPage(const std::string& ident);
+ virtual std::vector<std::string> actionsForPage(const std::string& ident);
+ virtual void dumpOptions();
+};
+class UserInterface {
+public:
+ virtual ~UserInterface();
+ virtual void setEngine(Engine* engine);
+ virtual void setVerbose(const int verbosity);
+ virtual void start();
+private:
+ Engine* _engine;
+};
+
+UserInterface* makeUserInterface();
