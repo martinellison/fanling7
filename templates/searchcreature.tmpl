@@ -1,0 +1,5 @@
+<h1>Creatures</h1>
+<table>
+<tr><th>Name</th><th>Points</th></tr>
+{{range .OwnIndex.GetPagesInOrder}} <tr><td><a href='{{.Ident}}.html'>{{.Name|html}}</a> ({{.Ident}})</th><td>{{.Points}}</td></tr>{{end}}
+</table>

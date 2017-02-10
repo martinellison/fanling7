@@ -1,0 +1,7 @@
+<h1>Actionable to-dos</h1>
+<table>
+<tr><th>Heading</th><th>Deadline</th><th>Project</th></tr>
+{{range  .OwnIndex.GetPagesInOrder}} <tr {{if (lt .DaysToDeadline 3)}}class=alert{{end}}>
+<td><a href='{{.Ident}}.html'>{{.Description|html}}</a> ({{.Ident}})</th><td>{{if .Deadline.IsZero}} {{else}}{{.Deadline.Format "2006-01-02"}}{{end}}</td><td>{{.Project}}</td>
+</tr>{{end}}
+</table>

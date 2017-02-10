@@ -1,0 +1,14 @@
+  <h1>{{.Page.Heading|html}}</h1>
+  <table>
+  <tr><td colspan=2>{{.Page.RenderedText}}</td></tr>
+ {{if (not .Page.Deadline.IsZero)}}  <tr><th>Deadline</th><td>{{.Page.Deadline.Format "2006-01-02"}}</td></tr>{{end}}
+ {{if (not .Page.ShowAfterDate.IsZero)}} <tr><th>Show After</th><td>{{.Page.ShowAfterDate.Format "2006-01-02"}}</td></tr>{{end}}
+  <tr><th>Created</th><td>{{.Page.WhenCreated.Format "2006-01-02"}}</td></tr>
+  <tr><th>Status</th><td>{{if .Page.Closed}}Closed {{.Page.WhenClosed.Format "2006-01-02"}}{{else}}Open{{end}} {{.Page.Status}}</td></tr>
+  {{if .Page.Project}}<tr><th>Project</th><td>{{.Page.Project}}</td></tr>{{end}}
+  {{if .Page.Context}}<tr><th>Context</th><td>{{.Page.Context}}</td></tr>{{end}}
+  {{if .Page.Priority}}<tr><th>Priority</th><td>{{.Page.Priority}}</td></tr>{{end}}
+  {{if .Page.IsWaitingOn}}<tr><th>WaitingOn</th><td>{{range .Page.PageWaitingOn}}<a href="{{.Ident}}.html">{{.Ident}}</a> {{.Description}} {{if .Closed}} (DONE){{end}}<br/>{{end}} {{if .Page.IsWaitingOn}} (waiting) {{end}}</td></tr>{{end}}
+  </table>
+
+<p>{{.Page.Ident}}</p>

@@ -1,0 +1,15 @@
+  <h1>{{.Page.Name}}</h1>{{.Page.RenderedText}}
+  <h2>Attributes</h2>
+  <table>
+  {{range $name, $value := .Page.AttributeDescription}}<tr><th>{{$name}}</th><td>{{$value}}</td></tr>{{end}}
+  </table>
+  <h2>Skills</h2>
+  <table>
+  {{range .Page.Skills}}<tr><th>{{.Name}} {{.Description}}</th><td>{{.LevelDescription}}</td></tr>{{end}}
+  </table>
+  <h2>Gifts and Faults</h2>
+  <table>
+  {{range .Page.GiftFaults}}<tr><th>{{.Name}}</th><td>{{.Description}}</td></tr>{{end}}
+  <tr><th>Points</th><td>{{.Page.Points}}</td></tr>
+  </table>
+<p>{{.Meta.Ident}}</p>
