@@ -20,3 +20,16 @@ _cgo_export.*
 _testmain.go
 
 *.exe
+*~
+bin
+*.gch
+wxexper
+*.so
+old/
+*.o
+*.goe
+temp/
+doc/
+out/
+cover.out
+cover/*.cover
