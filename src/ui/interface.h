@@ -17,8 +17,8 @@ class Engine {
 public:
     virtual ~Engine();
     virtual bool pageExists(const std::string& ident); /* used by UI */
-    virtual Error* applyAction(const std::string ident, const std::string actionName,const int actionNumber); /* used by UI and command line */
-    virtual Error* createPage(const std::string newIdent,const std::string newType); /* used by UI and command line */
+    virtual Error* getPage(const std::string& ident, bool& found, Page&* page);
+    virtual Error* createPage(const std::string newIdent,const std::string newType, Page&* page); /* used by UI and command line */
     virtual Error* exportPages(); /* used by command line */
     virtual void getInput(); /* used by UI and command line */
     virtual std::vector<std::string> getPageTypes(); /* used by UI */
@@ -32,11 +32,14 @@ public:
     virtual void readOptions(); /* used by command line */
     virtual std::string getPageOutURL(const std::string& ident); /* used by UI */
     virtual std::string identFromURL(const std::string& url); /* used by UI */
-    virtual std::string getPageYAMLDetail(const std::string& ident); /* used by UI */
-    virtual Error* setPageDetailAndProcess(const std::string& ident, const std::string& text); /* used by UI */
-    virtual bool canEditPage(const std::string& ident); /* used by UI */
-    virtual std::vector<std::string> actionsForPage(const std::string& ident); /* used by UI */
     virtual void dumpOptions(); /* used by command line */
+};
+class Page {    
+    virtual Error* applyAction(const std::string actionName,const int actionNumber); /* used by UI and command line */
+    virtual std::string getPageYAMLDetail(); /* used by UI */
+    virtual Error* setDetailAndProcess(const std::string& text); /* used by UI */
+    virtual bool canEdit(); /* used by UI */
+    virtual std::vector<std::string> actions(); /* used by UI */
 };
 class UserInterface {
 public:
