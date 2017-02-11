@@ -6,3 +6,4 @@
 2017-02-10 13:41:51 try to refactor ui
 2017-02-10 22:07:06 interfaces for store
 2017-02-11 09:17:29 more methods for store
+2017-02-11 09:53:17 try to fix swig

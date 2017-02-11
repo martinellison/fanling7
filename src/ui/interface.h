@@ -17,8 +17,8 @@ class Engine {
 public:
     virtual ~Engine();
     virtual bool pageExists(const std::string& ident); /* used by UI */
-    virtual Error* getPage(const std::string& ident, bool& found, Page&* page);
-    virtual Error* createPage(const std::string newIdent,const std::string newType, Page&* page); /* used by UI and command line */
+    virtual Error* getPage(const std::string& ident, bool& found, PagePtr& page);
+    virtual Error* createPage(const std::string newIdent,const std::string newType, PagePtr& page); /* used by UI and command line */
     virtual Error* exportPages(); /* used by command line */
     virtual void getInput(); /* used by UI and command line */
     virtual std::vector<std::string> getPageTypes(); /* used by UI */
@@ -41,6 +41,7 @@ class Page {
     virtual bool canEdit(); /* used by UI */
     virtual std::vector<std::string> actions(); /* used by UI */
 };
+typedef Page* PagePtr;
 class UserInterface {
 public:
     virtual ~UserInterface();

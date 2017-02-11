@@ -1,8 +1,6 @@
 %module(directors="1") ui
 %include "std_string.i"
 %include "std_vector.i"
-%include "std_shared_ptr.i"
-%shared_ptr(PageRef) //??
 namespace std {
  %template (stringVector) vector<string>;
 }
