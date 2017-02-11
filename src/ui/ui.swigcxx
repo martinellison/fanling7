@@ -8,4 +8,6 @@ namespace std {
  #include "interface.h"
 %}
 %feature("director") Error;
+%feature("director") Engine;
+%feature("director") Page;
 %include "interface.h"
