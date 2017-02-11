@@ -6,9 +6,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type MockStorable struct{}
+
+func (ms *MockStorable) Ident() (ident string)        { return "abc" }
+func (ms *MockStorable) IndexKey(indexNum int) string { return "xyz" }
+
 func TestStore1(s Store, t *testing.T) {
 	assert := assert.New(t)
-	storable, found := s.Get("fred")
+	_, found := s.Get("fred")
 	assert.False(found)
 }
 func TestStore2(s Store, t *testing.T) {
@@ -18,6 +23,14 @@ func TestStore2(s Store, t *testing.T) {
 }
 func TestStore3(s Store, t *testing.T) {
 	assert := assert.New(t)
-	ss := GetByFlagAndClear(0)
+	ss := s.GetByFlagAndClear(0)
 	assert.Equal(0, len(ss))
+}
+func TestStore4(s Store, t *testing.T) {
+	assert := assert.New(t)
+	ms := new(MockStorable)
+	s.Add(ms)
+	storable, found := s.Get("abc")
+	assert.True(found)
+	assert.Equal(ms, storable)
 }
