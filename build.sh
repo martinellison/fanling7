@@ -11,9 +11,9 @@ fi
 cd $BASE
 
 echo "GOPATH is now " $GOPATH
-MAINPACKAGES="fanling6"
+MAINPACKAGES="fanling7"
 CPPPACS="ui"
-SUBPACS="engine itemset filepersist $CPPPACS"
+SUBPACS="global store engine itemset filepersist $CPPPACS"
 
 for PACKAGE in $CPPPACS
 do

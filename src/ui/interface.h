@@ -34,7 +34,7 @@ public:
     virtual std::string identFromURL(const std::string& url); /* used by UI */
     virtual void dumpOptions(); /* used by command line */
 };
-class Page {    
+class Page {
     virtual Error* applyAction(const std::string actionName,const int actionNumber); /* used by UI and command line */
     virtual std::string getPageYAMLDetail(); /* used by UI */
     virtual Error* setDetailAndProcess(const std::string& text); /* used by UI */

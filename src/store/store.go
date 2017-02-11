@@ -4,11 +4,13 @@ type Store interface {
 	Add(storable Storable)
 	Changed(storable Storable)
 	Get(ident string) (storable Storable, found bool)
+	GetByIndex(indexNum int) []Storable
+	Flag(flagNum int, storable Storable)
+	GetByFlagAndClear(flagNum int) []Storable
 	Close()
 }
 
 type Storable interface {
 	Ident() (ident string)
+	IndexKey(indexNum int) string
 }
-
-type StoreHelper interface{}
