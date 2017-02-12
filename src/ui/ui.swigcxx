@@ -1,13 +1,13 @@
 %module(directors="1") ui
 %include "std_string.i"
 %include "std_vector.i"
-namespace std {
- %template (stringVector) vector<string>;
- %template (pagePtrVector) vector<PagePtr>;
-}
 %{
  #include "interface.h"
 %}
+namespace std {
+ %template (stringVector) vector<string>;
+// %template (pagePtrVector) vector<PagePtr>;
+}
 %feature("director") Engine;
 %feature("director") Page;
 %include "interface.h"

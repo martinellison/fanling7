@@ -55,9 +55,9 @@ func init() {
 	CopyStringVector.Add("copy")
 }
 
-// A Fanling6Error is an error-like structure that implements the ui.Error interface. This can be passed back to the C++ code
-// `Fanling6Error`
-type Fanling6Error struct {
+// A Fanling7Error is an error-like structure that implements the ui.Error interface. This can be passed back to the C++ code
+// `Fanling7Error`
+type Fanling7Error struct {
 	severity ui.Severity
 	text     string
 }
@@ -65,19 +65,19 @@ type Fanling6Error struct {
 // Implement the interface.
 
 // `Ok` is false for real errors, true for non-errors
-func (e *Fanling6Error) Ok() bool { return e.severity == ui.Severity_ok }
+func (e *Fanling7Error) Ok() bool { return e.severity == ui.Severity_ok }
 
 // `Severity` is the kind of error (user, system).
-func (e *Fanling6Error) Severity() ui.Severity { return e.severity }
+func (e *Fanling7Error) Severity() ui.Severity { return e.severity }
 
 // `Text` explains the error.
-func (e *Fanling6Error) Text() string { return e.text }
+func (e *Fanling7Error) Text() string { return e.text }
 
 var OkError ui.Error
 
 // `init` creates `OkError` once so we do not need to do it every time.
 func init() {
-	OkError = ui.NewDirectorError(&Fanling6Error{severity: ui.Severity_ok, text: "ok"})
+	OkError = ui.NewDirectorError(&Fanling7Error{severity: ui.Severity_ok, text: "ok"})
 }
 
 // `MakeError` creates an error object.
@@ -88,12 +88,12 @@ func MakeError(p interface{}) ui.Error {
 		return ep
 	}
 	log.Printf("system error: %v", p)
-	return ui.NewDirectorError(&Fanling6Error{severity: ui.Severity_system, text: fmt.Sprintf("%v", p)})
+	return ui.NewDirectorError(&Fanling7Error{severity: ui.Severity_system, text: fmt.Sprintf("%v", p)})
 }
 
 // `PanicUserError` panics with an error.
 func PanicUserError(f string, p ...interface{}) {
-	panic(ui.NewDirectorError(&Fanling6Error{severity: ui.Severity_user, text: fmt.Sprintf(f, p...)}))
+	panic(ui.NewDirectorError(&Fanling7Error{severity: ui.Severity_user, text: fmt.Sprintf(f, p...)}))
 }
 
 // `SetupPanicHandler` sets up a panic handler (for `defer`) for a function.

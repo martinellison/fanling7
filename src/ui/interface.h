@@ -32,7 +32,7 @@ struct Result {
     Severity severity;
     std::string text;
     PagePtr page;
-    std::vector<PagePtr> pages;
+//    std::vector<PagePtr> pages;
 };
 class Engine {
 public:
@@ -89,10 +89,14 @@ public:
 };
 class UserInterface {
 public:
-    virtual ~UserInterface();
-    virtual void setEngine(Engine* engine); /* used by UIand command line */
-    virtual void setVerbose(const int verbosity);
-    virtual void start();
+    ~UserInterface() {}
+    void setEngine(Engine* engine) {
+        _engine=engine;
+    }
+    void setVerbose(const int verbosity) {
+        _verbosity=verbosity;
+    }
+    void start();
 private:
     Engine* _engine;
     int _verbosity;

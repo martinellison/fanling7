@@ -1,9 +1,9 @@
 #include "wxui.h"
 using namespace std;
 
-//-- Fanling6Frame --
-Fanling6Frame::Fanling6Frame(Engine* engine)
-    : wxFrame(NULL, wxID_ANY, "Fanling6", wxDefaultPosition, wxDefaultSize,
+//-- Fanling7Frame --
+Fanling7Frame::Fanling7Frame(Engine* engine)
+    : wxFrame(NULL, wxID_ANY, "Fanling7", wxDefaultPosition, wxDefaultSize,
               wxDEFAULT_FRAME_STYLE), _engine(engine) {
     if(verbosity>0)  cerr<<"creating user interface\n";
 //_engine->getInput();
@@ -13,13 +13,13 @@ Fanling6Frame::Fanling6Frame(Engine* engine)
     menuBar->Append(menuFile, "&File");
     SetMenuBar(menuBar);
     CreateStatusBar();
-    SetStatusText("Fanling6 started.");
+    SetStatusText("Fanling7 started.");
     makeControls();
     bindControls() ;
     SetSizerAndFit(_sizer);
 }
 
-void Fanling6Frame::makeControls() {
+void Fanling7Frame::makeControls() {
     _sizer = new wxFlexGridSizer(1, 1, 1);
     _controlSizer = new wxFlexGridSizer(4, 1, 1);
     _sizer->Add(_controlSizer);
@@ -32,13 +32,13 @@ void Fanling6Frame::makeControls() {
     wxChoice* typeListChoice = new wxChoice(this, IDTYPE, wxDefaultPosition, wxDefaultSize, items, wxCB_SORT);
     _controlSizer->Add(typeListChoice);
     _controlSizer->Add(new wxStaticText(this, wxID_ANY, "Page ident:"));
-    std::vector<std::string> pages=_engine->getPages();
-    items.Clear();
-    for(string& s : pages) items.Add(s);
-    items.Sort();
-    _identCombo = new wxComboBox(this, IDIDENT);
-    _identCombo->Append(items);
-    _controlSizer->Add(_identCombo);
+    //std::vector<std::string> pages=_engine->getPages();
+    //items.Clear();
+    //for(string& s : pages) items.Add(s);
+    //items.Sort();
+    //_identCombo = new wxComboBox(this, IDIDENT);
+    //_identCombo->Append(items);
+    //_controlSizer->Add(_identCombo);
     _controlSizer->Add(new wxStaticText(this, wxID_ANY, ""));
     wxButton* makePageButton = new wxButton(this, IDMAKEPAGE, "Make page");
     _controlSizer->Add(makePageButton);
@@ -69,7 +69,7 @@ void Fanling6Frame::makeControls() {
     _sizer->AddGrowableRow(2);
 
 }
-void Fanling6Frame::bindControls() {
+void Fanling7Frame::bindControls() {
 
     Bind(wxEVT_MENU, [=](wxCommandEvent&) {
         Close(true);
@@ -104,7 +104,7 @@ void Fanling6Frame::bindControls() {
     }, IDACTNUM);
     Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
         Result result;
-        _engine->getPage(ident,  result);
+        _engine->getPage(_chosenIdent,  result);
         showResult(result);
         if(_chosenIdent=="" or result.severity!=Severity::okFound or _actionName=="") {
             showError("no page to show, no action, or page does not exist.");
@@ -133,7 +133,7 @@ void Fanling6Frame::bindControls() {
             return;
         }
         Result result;
-        _engine->getPage(ident,  result);
+        _engine->getPage(_chosenIdent,  result);
         showResult(result);
         if(result.severity!=Severity::okFound and _chosenType != "") {
             _engine-> createPage(_chosenIdent,_chosenType,result);
@@ -149,7 +149,7 @@ void Fanling6Frame::bindControls() {
         showWebEdit(_showEditCheck->GetValue());
     }, IDREVERT);
 }
-void Fanling6Frame::styleEditor() {
+void Fanling7Frame::styleEditor() {
 #pragma GCC diagnostic ignored "-Woverflow"
     _textEd=new wxStyledTextCtrl(this, IDEDIT, wxDefaultPosition, wxSize(200,200));
     _textEd->SetLexerLanguage("yaml");
@@ -178,7 +178,7 @@ void Fanling6Frame::styleEditor() {
     _textEd->StyleSetForeground(wxSTC_YAML_TEXT , wxColour(256, 256, 256));
 #pragma GCC diagnostic pop
 }
-void Fanling6Frame::setPage(const string ident,const bool web, const bool force) {
+void Fanling7Frame::setPage(const string ident,const bool web, const bool force) {
     string oldIdent = _chosenIdent;
     if(verbosity>0) cerr<<ident<<": getting page, previous "<<oldIdent<<"\n";
     Result result;
@@ -209,9 +209,9 @@ void Fanling6Frame::setPage(const string ident,const bool web, const bool force)
     _actNameChoice->Set(actionsWx);
     if(web)_webView->LoadURL(_engine->getPageOutURL(ident));
 }
-void Fanling6Frame::showWebEdit(const bool showEdit) {
+void Fanling7Frame::showWebEdit(const bool showEdit) {
     Result result;
-    _engine->getPage(ident,  result);
+    _engine->getPage(_chosenIdent,  result);
     showResult(result);
     if(_chosenIdent=="" or result.severity!=Severity::okFound) {
         showError("no page to show or page does not exist.");
@@ -226,7 +226,7 @@ void Fanling6Frame::showWebEdit(const bool showEdit) {
     if(showEdit) _textEd->ChangeValue(page->getPageYAMLDetail());
     else _webView->LoadURL(_engine->getPageOutURL(_chosenIdent));
 }
-void Fanling6Frame::loadEditor(const string oldIdent, const string ident) {
+void Fanling7Frame::loadEditor(const string oldIdent, const string ident) {
     if(oldIdent!="" and _textEd->IsModified()) {
         int res = wxMessageBox("Edit text "+oldIdent+" has been changed, save?", "Save?", wxYES_NO|wxCANCEL|wxCENTRE);
         switch(res) {
@@ -245,7 +245,7 @@ void Fanling6Frame::loadEditor(const string oldIdent, const string ident) {
         _textEd->ChangeValue(result.page->getPageYAMLDetail());
     _textEd->SetModified(false);
 }
-void Fanling6Frame::savePage(string ident) {
+void Fanling7Frame::savePage(string ident) {
     string newValue=string(_textEd->GetValue());
     if(verbosity>0) cerr<<"saving page "<<ident<< " with "<<newValue<<"\n-----\n";
     Result result;
@@ -255,7 +255,7 @@ void Fanling6Frame::savePage(string ident) {
     showResult(result);
     _textEd->SetModified(false);
 }
-void Fanling6Frame::showIndex() {
+void Fanling7Frame::showIndex() {
     setPage("index");
 }
 void showError(const string& msg, const Severity severity) {
@@ -278,13 +278,13 @@ void showResult(const Result& result) {
     (void) wxMessageBox(result.text, result.severity==Severity::system?"System error":"User error", wxOK|wxCENTRE|wxICON_ERROR);
 }
 
-//-- Fanling6App --
-bool Fanling6App::OnInit() {
+//-- Fanling7App --
+bool Fanling7App::OnInit() {
     if(verbosity>0) cerr << "init user interface...\n";
-    Fanling6Frame* frame = new Fanling6Frame(_engine);
+    Fanling7Frame* frame = new Fanling7Frame(_engine);
     frame->verbosity=verbosity;
     frame->showIndex();
     frame->Show(true);
     return true;
 }
-wxIMPLEMENT_APP_NO_MAIN(Fanling6App);
+wxIMPLEMENT_APP_NO_MAIN(Fanling7App);

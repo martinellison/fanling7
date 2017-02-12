@@ -5,17 +5,10 @@
 using namespace std;
 
 //-- UserInterface --
-UserInterface::~UserInterface() {}
-void UserInterface::setEngine(Engine* engine) {
-    _engine=engine;
-}
-void UserInterface::setVerbose(const int verbosity) {
-    _verbosity=verbosity;
-}
 void UserInterface::start() {
     try {
         cerr << "starting wx ui\n";
-        Fanling6App* app = new Fanling6App();
+        Fanling7App* app = new Fanling7App();
         app->setEngine(_engine);
         app->verbosity=_verbosity;
         wxApp::SetInstance(app);

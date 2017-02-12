@@ -11,10 +11,10 @@ using namespace std;
 void showResult(const Result& result) ;
 void showError(const string& msg, const Severity severity=Severity::user);
 enum  EditStyles {EDITMARGIN};
-//-- Fanling6Frame --
-class Fanling6Frame: public wxFrame {
+//-- Fanling7Frame --
+class Fanling7Frame: public wxFrame {
 public:
-    Fanling6Frame(Engine* engine);
+    Fanling7Frame(Engine* engine);
     void showIndex();
     int verbosity=0;
 private:
@@ -45,10 +45,10 @@ private:
 };
 enum {IDDOIT = 1, IDTYPE, IDIDENT, IDMAKEPAGE, IDACTIDENT, IDACTION, IDACTNAME, IDACTNUM, IDSHOWEDIT, IDWEBVIEW, IDSAVEEDIT, IDREVERT, IDEDIT} WindoIds;
 
-//-- Fanling6App --
-class Fanling6App : public wxApp {
+//-- Fanling7App --
+class Fanling7App : public wxApp {
 public:
-    Fanling6App() {
+    Fanling7App() {
     }
     void setEngine(Engine* engine) {
         _engine=engine;
