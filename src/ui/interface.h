@@ -3,45 +3,88 @@
 #include <memory>
 #include <string>
 #include <vector>
-enum class Severity {
-    ok, user, system
-};
-class Error {
-public:
-    virtual ~Error() {}
-    virtual bool ok();
-    virtual Severity severity();
-    virtual std::string text();
-};
-class Engine {
-public:
-    virtual ~Engine();
-    virtual bool pageExists(const std::string& ident); /* used by UI */
-    virtual Error* getPage(const std::string& ident, bool& found, PagePtr& page);
-    virtual Error* createPage(const std::string newIdent,const std::string newType, PagePtr& page); /* used by UI and command line */
-    virtual Error* exportPages(); /* used by command line */
-    virtual void getInput(); /* used by UI and command line */
-    virtual std::vector<std::string> getPageTypes(); /* used by UI */
-    virtual std::vector<std::string> getPages(); /* used by UI */
-    virtual void setConfig(const std::string& path); /* used by command line */
-    virtual void setIndir(const std::string& dir); /* used by command line */
-    virtual void setOutdir(const std::string& dir); /* used by command line */
-    virtual void setMetadir(const std::string& dir); /* used by command line */
-    virtual void setVerbose(const int verbosity); /* used by command line */
-    virtual void init(); /* used by command line */
-    virtual void readOptions(); /* used by command line */
-    virtual std::string getPageOutURL(const std::string& ident); /* used by UI */
-    virtual std::string identFromURL(const std::string& url); /* used by UI */
-    virtual void dumpOptions(); /* used by command line */
-};
+struct Result;
+class Page ;
+class Engine;
 class Page {
-    virtual Error* applyAction(const std::string actionName,const int actionNumber); /* used by UI and command line */
+    virtual void applyAction(const std::string actionName,const int actionNumber, Result& result); /* used by UI and command line */
     virtual std::string getPageYAMLDetail(); /* used by UI */
-    virtual Error* setDetailAndProcess(const std::string& text); /* used by UI */
+    virtual void setDetailAndProcess(const std::string& text, Result& result); /* used by UI */
     virtual bool canEdit(); /* used by UI */
     virtual std::vector<std::string> actions(); /* used by UI */
 };
 typedef Page* PagePtr;
+enum class Severity {
+    okFound, notFound, user, system
+};
+struct Result {
+    bool ok() {
+        switch(severity) {
+        default:
+            return false;
+        case Severity::okFound:
+        case Severity::notFound:
+            return true;
+        }
+    }
+    Severity severity;
+    std::string text;
+    PagePtr page;
+    std::vector<PagePtr> pages;
+};
+class Engine {
+public:
+    virtual ~Engine() {}
+    virtual bool pageExists(const std::string& ident) {
+        throw "bad call";   /* used by UI */
+    }
+    virtual void getPage(const std::string& ident, Result& result) {
+        throw "bad call";
+    }
+    virtual void createPage(const std::string newIdent, Result& result) {
+        throw "bad call";   /* used by UI and command line */
+    }
+    virtual void exportPages(Result& result) {
+        throw "bad call";   /* used by command line */
+    }
+    virtual void getInput() {
+        throw "bad call";   /* used by UI and command line */
+    }
+    virtual std::vector<std::string> getPageTypes() {
+        throw "bad call";   /* used by UI */
+    }
+    // virtual std::vector<std::string> getPages(); /* used by UI */
+    virtual void setConfig(const std::string& path) {
+        throw "bad call";   /* used by command line */
+    }
+    virtual void setIndir(const std::string& dir) {
+        throw "bad call";   /* used by command line */
+    }
+    virtual void setOutdir(const std::string& dir) {
+        throw "bad call";   /* used by command line */
+    }
+    virtual void setMetadir(const std::string& dir) {
+        throw "bad call";   /* used by command line */
+    }
+    virtual void setVerbose(const int verbosity) {
+        throw "bad call";   /* used by command line */
+    }
+    virtual void init() {
+        throw "bad call";   /* used by command line */
+    }
+    virtual void readOptions() {
+        throw "bad call";
+    }/* used by command line*/
+    virtual std::string getPageOutURL(const std::string& ident) {
+        throw "bad call";   /* used by UI */
+    }
+    virtual std::string identFromURL(const std::string& url) {
+        throw "bad call";   /* used by UI */
+    }
+    virtual void dumpOptions() {
+        throw "bad call";   /* used by command line */
+    }
+};
 class UserInterface {
 public:
     virtual ~UserInterface();

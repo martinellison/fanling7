@@ -8,7 +8,7 @@
 #include <iostream>
 #include "interface.h"
 using namespace std;
-void showError(Error* err);
+void showError(Result& result);
 void showError(const string& msg, const Severity severity=Severity::user);
 enum  EditStyles {EDITMARGIN};
 //-- Fanling6Frame --

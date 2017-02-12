@@ -3,11 +3,11 @@
 %include "std_vector.i"
 namespace std {
  %template (stringVector) vector<string>;
+ %template (pagePtrVector) vector<PagePtr>;
 }
 %{
  #include "interface.h"
 %}
-%feature("director") Error;
 %feature("director") Engine;
 %feature("director") Page;
 %include "interface.h"
