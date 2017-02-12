@@ -89,7 +89,9 @@ void Fanling6Frame::bindControls() {
             showError("no page to create or no page type.");
             return;
         }
-        showError(_engine-> createPage(newIdent,_chosenType));
+        Result result;
+        _engine-> createPage(newIdent,_chosenType, result);
+        showResult(result);
         _identCombo->Append(newIdent);
         setPage(newIdent);
         SetStatusText("Page created.");
@@ -101,11 +103,16 @@ void Fanling6Frame::bindControls() {
         _actionNumber=_actNumSpin->GetValue();
     }, IDACTNUM);
     Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
-        if(_chosenIdent=="" or !_engine->pageExists(_chosenIdent)or _actionName=="") {
+        Result result;
+        _engine->getPage(ident,  result);
+        showResult(result);
+        if(_chosenIdent=="" or result.severity!=Severity::okFound or _actionName=="") {
             showError("no page to show, no action, or page does not exist.");
             return;
         }
-        showError(_engine->applyAction(_chosenIdent, _actionName,_actionNumber));
+        PagePtr page =  result.page;
+        page->applyAction(_actionName,_actionNumber, result);
+        showResult(result);
         setPage(_chosenIdent, true, true);
         SetStatusText(_actionName+" done.");
     }, IDACTION);
@@ -125,8 +132,13 @@ void Fanling6Frame::bindControls() {
             showError("no page to save.");
             return;
         }
-        if(!_engine->pageExists(_chosenIdent) and _chosenType != "")
-            showError(_engine-> createPage(_chosenIdent,_chosenType));
+        Result result;
+        _engine->getPage(ident,  result);
+        showResult(result);
+        if(result.severity!=Severity::okFound and _chosenType != "") {
+            _engine-> createPage(_chosenIdent,_chosenType,result);
+            showResult(result);
+        }
         savePage(_chosenIdent) ;
     }, IDSAVEEDIT);
     Bind(wxEVT_BUTTON, [=](wxCommandEvent&) {
@@ -169,11 +181,15 @@ void Fanling6Frame::styleEditor() {
 void Fanling6Frame::setPage(const string ident,const bool web, const bool force) {
     string oldIdent = _chosenIdent;
     if(verbosity>0) cerr<<ident<<": getting page, previous "<<oldIdent<<"\n";
-    if((!force and oldIdent==ident) or !_engine->pageExists(ident)) return;
+    Result result;
+    _engine->getPage(ident,  result);
+    showResult(result);
+    if((!force and oldIdent==ident) or result.severity!=Severity::okFound) return;
+    PagePtr page = result.page;
     _chosenIdent=ident;
     _identCombo->SetValue(_chosenIdent);
     loadEditor(oldIdent, _chosenIdent);
-    const bool canEdit= _engine->canEditPage(ident);
+    const bool canEdit=page->canEdit();
     if(!canEdit) {
         showWebEdit(false);
         _showEditCheck->SetValue(false);
@@ -184,7 +200,7 @@ void Fanling6Frame::setPage(const string ident,const bool web, const bool force)
     if(verbosity>0)
         cerr<<"setting controls for "<<ident<<(canEdit?", can":", cannot")<<" edit\n";
     if(ident!="") {
-        vector<string> actions = _engine->actionsForPage(ident);
+        vector<string> actions = page->actions();
         for(string& s : actions) {
             actionsWx.Add(s);
             if(verbosity>0)cerr << s << ": action\n";
@@ -194,16 +210,20 @@ void Fanling6Frame::setPage(const string ident,const bool web, const bool force)
     if(web)_webView->LoadURL(_engine->getPageOutURL(ident));
 }
 void Fanling6Frame::showWebEdit(const bool showEdit) {
-    if(_chosenIdent=="" or !_engine->pageExists(_chosenIdent)) {
+    Result result;
+    _engine->getPage(ident,  result);
+    showResult(result);
+    if(_chosenIdent=="" or result.severity!=Severity::okFound) {
         showError("no page to show or page does not exist.");
         return;
     }
+    PagePtr page = result.page;
     _sizer->Show(_webView, !showEdit);
     _sizer->Show(_textEd,showEdit);
     _controlSizer->Show(_saveEditButton,showEdit);
     _controlSizer->Show(_revertButton,showEdit);
     _sizer-> Layout();
-    if(showEdit) _textEd->ChangeValue(_engine->getPageYAMLDetail(_chosenIdent));
+    if(showEdit) _textEd->ChangeValue(page->getPageYAMLDetail());
     else _webView->LoadURL(_engine->getPageOutURL(_chosenIdent));
 }
 void Fanling6Frame::loadEditor(const string oldIdent, const string ident) {
@@ -218,26 +238,44 @@ void Fanling6Frame::loadEditor(const string oldIdent, const string ident) {
             savePage(oldIdent);
         }
     }
-    if(ident != "" and _engine->pageExists(ident))
-        _textEd->ChangeValue(_engine->getPageYAMLDetail(ident));
+    Result result;
+    _engine->getPage(ident,  result);
+    showResult(result);
+    if(ident != "" and result.severity==Severity::okFound)
+        _textEd->ChangeValue(result.page->getPageYAMLDetail());
     _textEd->SetModified(false);
 }
 void Fanling6Frame::savePage(string ident) {
     string newValue=string(_textEd->GetValue());
     if(verbosity>0) cerr<<"saving page "<<ident<< " with "<<newValue<<"\n-----\n";
-    showError(_engine->setPageDetailAndProcess(ident,newValue));
+    Result result;
+    _engine->getPage(ident,  result);
+    showResult(result);
+    result.page->setDetailAndProcess(newValue, result);
+    showResult(result);
     _textEd->SetModified(false);
 }
 void Fanling6Frame::showIndex() {
     setPage("index");
 }
-void showError(Error* err) {
-    if(err->ok()) return;
-    (void) wxMessageBox(err->text(), err->severity()==Severity::system?"System error":"User error", wxOK|wxCENTRE|wxICON_ERROR);
-}
 void showError(const string& msg, const Severity severity) {
-    if(severity==Severity::ok) return;
-    (void) wxMessageBox(msg, severity==Severity::system?"System error":"User error", wxOK|wxCENTRE|wxICON_ERROR);
+    std::string text;
+    switch(severity) {
+    default:
+        text="User error";
+        break;
+    case  Severity::system:
+        text="System error";
+        break;
+    case Severity::okFound:
+    case Severity::notFound:
+        return  ;
+    }
+    (void) wxMessageBox(msg, text, wxOK|wxCENTRE|wxICON_ERROR);
+}
+void showResult(const Result& result) {
+    if(result.ok()) return;
+    (void) wxMessageBox(result.text, result.severity==Severity::system?"System error":"User error", wxOK|wxCENTRE|wxICON_ERROR);
 }
 
 //-- Fanling6App --

@@ -7,6 +7,8 @@ struct Result;
 class Page ;
 class Engine;
 class Page {
+public:
+    virtual ~Page() {}
     virtual void applyAction(const std::string actionName,const int actionNumber, Result& result); /* used by UI and command line */
     virtual std::string getPageYAMLDetail(); /* used by UI */
     virtual void setDetailAndProcess(const std::string& text, Result& result); /* used by UI */
@@ -18,7 +20,7 @@ enum class Severity {
     okFound, notFound, user, system
 };
 struct Result {
-    bool ok() {
+    bool ok() const {
         switch(severity) {
         default:
             return false;
@@ -35,13 +37,13 @@ struct Result {
 class Engine {
 public:
     virtual ~Engine() {}
-    virtual bool pageExists(const std::string& ident) {
-        throw "bad call";   /* used by UI */
-    }
+    //virtual bool pageExists(const std::string& ident) {
+    //throw "bad call";   /* used by UI */
+    //}
     virtual void getPage(const std::string& ident, Result& result) {
         throw "bad call";
     }
-    virtual void createPage(const std::string newIdent, Result& result) {
+    virtual void createPage(const std::string newIdent, const std::string pageType, Result& result) {
         throw "bad call";   /* used by UI and command line */
     }
     virtual void exportPages(Result& result) {
