@@ -1,11 +1,17 @@
 package pagestore
 
 import (
+	"filepersist"
 	"store"
 	"testing"
 )
 
-func makeTestPersistentPageStore() *PersistentPageStore { return &PersistentPageStore{} }
+func makeTestPersistentPageStore() *PersistentPageStore {
+	p := &filepersist.FilePersistor{}
+	p.Open("?")
+	s := &PersistentPageStore{Persistor: p}
+	return s
+}
 
 // `TestPersistentPageStore1` tests
 func TestPersistentPageStore1(t *testing.T) {
@@ -32,7 +38,9 @@ func TestPersistentPageStore4(t *testing.T) {
 }
 
 func makeTestPageStore() *PageStore {
-	return &PageStore{backStore: makeTestPersistentPageStore()}
+	s := &PageStore{backStore: makeTestPersistentPageStore()}
+	s.items.Init()
+	return s
 }
 
 // `TestPageStore1` tests

@@ -2,6 +2,7 @@ package pagestore
 
 import (
 	"itemset"
+	"persist"
 	"store"
 )
 
@@ -19,6 +20,7 @@ func (ps *PageStore) GetByFlagAndClear(flagNum int) []store.Storable         { r
 func (ps *PageStore) Close()                                                 {}
 
 type PersistentPageStore struct {
+	persist.Persistor
 }
 
 func (ps *PersistentPageStore) Add(storable store.Storable)                            {}
