@@ -6,7 +6,7 @@ type Store interface {
 	Get(ident string) (storable Storable, found bool)
 	GetByIndex(indexNum int) []Storable
 	Flag(flagNum int, storable Storable)
-	GetByFlagAndClear(flagNum int) []Storable
+	GetByFlagAndClear(flagNum int) map[string]Storable
 	Close()
 }
 
