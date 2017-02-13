@@ -29,6 +29,15 @@ struct Result {
             return true;
         }
     }
+    Result() : severity(Severity::okFound), text(""), page(nullptr) {}
+    void setError(const std::string message="",const Severity s=Severity::user) {
+        severity=s;
+        text=message;
+    }
+    void setFound(const PagePtr p, const bool found=true) {
+        severity=found?Severity::okFound:Severity::notFound;
+        page=p;
+    }
     Severity severity;
     std::string text;
     PagePtr page;

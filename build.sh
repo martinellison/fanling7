@@ -13,8 +13,9 @@ cd $BASE
 echo "GOPATH is now " $GOPATH
 MAINPACKAGES="fanling7"
 CPPPACS="ui"
-SUBPACS="global store engine itemset filepersist $CPPPACS"
+SUBPACS="global store engine itemset filepersist pagestore $CPPPACS"
 
+echo "building c++..."
 for PACKAGE in $CPPPACS
 do
     astyle --style=attach --unpad-paren --align-pointer=type --remove-brackets $BASE/src/$PACKAGE/*.cpp $BASE/src/$PACKAGE/*.h
@@ -42,21 +43,30 @@ do
     fi
     goimports -w $BASE/src/$PACKAGE
 done
+echo "testing..."
+TESTPACKAGES="itemset filepersist pagestore"
+mkdir -p cover
+for PACKAGE in $TESTPACKAGES
+do
+    TESTBIN=bin/test$PACKAGE
+    rm -f $TESTBIN
+    go test -c -cover -o $TESTBIN $PACKAGE
+    COVERPROF=cover/$PACKAGE.cover
+    if [[ -f $TESTBIN ]]
+    then
+        echo '========= running test' $PACKAGE '========='
+        TESTRUNRRES=99
+        $TESTBIN -test.coverprofile=$COVERPROF
+        TESTRUNRRES=$?
+        if [[ $TESTRUNRRES != 0 ]]
+        then
+            echo "test failed"
+            exit 1
+        fi
+        go tool cover -func=$COVERPROF | grep -v '100.0%'
+    fi
+done
 echo "building..."
-#if [[ "$SUBPACS" != "" ]]
-#then
-#for PACKAGE in $SUBPACS
-#do
-#echo "building" $PACKAGE
-#go build $PACKAGE
-#BUILDRES=$?
-#if [[ $BUILDRES != 0 ]]
-#then
-#echo $PACKAGE "Build result is" $BUILDRES
-#exit 1
-#fi
-#done
-#fi
 for MAINPACKAGE in $MAINPACKAGES
 do
     MAIN=$BASE/bin/$MAINPACKAGE
@@ -82,27 +92,6 @@ do
     then
         echo "vet for $PACKAGE failed with status $VETRES"
         exit 1
-    fi
-done
-TESTPACKAGES="itemset filepersist engine"
-for PACKAGE in $TESTPACKAGES
-do
-    TESTBIN=bin/test$PACKAGE
-    rm -f $TESTBIN
-    go test -c -cover -o $TESTBIN $PACKAGE
-    COVERPROF=cover/$PACKAGE.cover
-    if [[ -f $TESTBIN ]]
-    then
-        echo '========= running test' $PACKAGE '========='
-        TESTRUNRRES=99
-        $TESTBIN -test.coverprofile=$COVERPROF
-        TESTRUNRRES=$?
-        if [[ $TESTRUNRRES != 0 ]]
-        then
-            echo "test failed"
-            exit 1
-        fi
-        go tool cover -func=$COVERPROF | grep -v '100.0%'
     fi
 done
 if [[ -d cclog ]]
