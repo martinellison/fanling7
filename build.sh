@@ -44,7 +44,7 @@ do
     goimports -w $BASE/src/$PACKAGE
 done
 echo "testing..."
-TESTPACKAGES="itemset filepersist pagestore"
+TESTPACKAGES="itemset filepersist engine pagestore"
 mkdir -p cover
 for PACKAGE in $TESTPACKAGES
 do

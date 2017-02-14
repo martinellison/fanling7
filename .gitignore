@@ -33,3 +33,4 @@ doc/
 out/
 cover.out
 cover/*.cover
+test

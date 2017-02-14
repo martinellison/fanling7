@@ -9,11 +9,13 @@ class Engine;
 class Page {
 public:
     virtual ~Page() {}
-    virtual void applyAction(const std::string actionName,const int actionNumber, Result& result); /* used by UI and command line */
-    virtual std::string getPageYAMLDetail(); /* used by UI */
-    virtual void setDetailAndProcess(const std::string& text, Result& result); /* used by UI */
-    virtual bool canEdit(); /* used by UI */
-    virtual std::vector<std::string> actions(); /* used by UI */
+    virtual void applyAction(const std::string actionName,const int actionNumber, Result& result) {} /* used by UI and command line */
+    virtual std::string getPageYAMLDetail() {} /* used by UI */
+    virtual void setDetailAndProcess(const std::string& text, Result& result) {} /* used by UI */
+    virtual bool canEdit() {
+        return false;   /* used by UI */
+    }
+    virtual std::vector<std::string> actions() {} /* used by UI */
 };
 typedef Page* PagePtr;
 enum class Severity {
@@ -28,6 +30,12 @@ struct Result {
         case Severity::notFound:
             return true;
         }
+    }
+    bool found() const {
+        return severity==Severity::okFound;
+    }
+    bool notFound() const {
+        return severity==Severity::notFound;
     }
     Result() : severity(Severity::okFound), text(""), page(nullptr) {}
     void setError(const std::string message="",const Severity s=Severity::user) {
