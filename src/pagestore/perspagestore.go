@@ -9,6 +9,7 @@ import (
 type PersistentPageStore struct {
 	persist.Persistor
 	Freezer
+	flagged []map[string]store.Storable
 }
 
 //Open(path string)
@@ -21,7 +22,7 @@ type PersistentPageStore struct {
 func MakePersistentPageStore(path string, freezer Freezer) *PersistentPageStore {
 	p := &filepersist.FilePersistor{}
 	p.Open(path)
-	s := &PersistentPageStore{Persistor: p, Freezer: freezer}
+	s := &PersistentPageStore{Persistor: p, Freezer: freezer, flagged: make([]map[string]store.Storable, store.MaxFlag)}
 	return s
 }
 
@@ -29,7 +30,10 @@ func (pps *PersistentPageStore) Add(storable store.Storable) {
 	ps := storable.(Freezable)
 	pps.Persistor.WritePage(ps.Meta(), ps.Detail())
 }
-func (pps *PersistentPageStore) Changed(storable store.Storable) {}
+func (pps *PersistentPageStore) Changed(storable store.Storable) {
+	ps := storable.(Freezable)
+	pps.Persistor.WritePage(ps.Meta(), ps.Detail())
+}
 func (pps *PersistentPageStore) Get(ident string) (storable store.Storable, found bool) {
 	meta, detail, found := pps.Persistor.ReadPage(ident)
 	if found {
@@ -37,10 +41,29 @@ func (pps *PersistentPageStore) Get(ident string) (storable store.Storable, foun
 	}
 	return
 }
-func (pps *PersistentPageStore) GetByIndex(indexNum int) []store.Storable                { return nil }
-func (pps *PersistentPageStore) Flag(flagNum int, storable store.Storable)               {}
-func (pps *PersistentPageStore) GetByFlagAndClear(flagNum int) map[string]store.Storable { return nil }
-func (pps *PersistentPageStore) Close()                                                  { pps.Persistor.Close() }
+func (pps *PersistentPageStore) GetByIndex(indexNum int) []store.Storable {
+	//  panic("not coded") // TODO: need index over all pages
+	return []store.Storable{}
+}
+func (pps *PersistentPageStore) Flag(flagNum int, storable store.Storable) {
+	m := pps.flagged[flagNum]
+	if m == nil {
+		m = make(map[string]store.Storable, 0)
+		pps.flagged[flagNum] = m
+	}
+	m[storable.Ident()] = storable
+}
+func (pps *PersistentPageStore) GetByFlagAndClear(flagNum int) map[string]store.Storable {
+	m := pps.flagged[flagNum]
+	if m == nil {
+		m = make(map[string]store.Storable, store.MaxFlag)
+		pps.flagged[flagNum] = m
+	}
+	pps.flagged[flagNum] = m
+	return m
+	return nil
+}
+func (pps *PersistentPageStore) Close() { pps.Persistor.Close() }
 
 type Freezable interface {
 	store.Storable
