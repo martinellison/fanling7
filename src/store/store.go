@@ -14,3 +14,6 @@ type Storable interface {
 	Ident() (ident string)
 	IndexKey(indexNum int) string
 }
+
+const MaxFlag = 1
+const MaxIndex = 1

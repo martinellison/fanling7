@@ -51,6 +51,12 @@ do
     TESTBIN=bin/test$PACKAGE
     rm -f $TESTBIN
     go test -c -cover -o $TESTBIN $PACKAGE
+    BUILDRES=$?
+    if [[ $BUILDRES != 0 ]]
+    then
+        echo $MAIN " test build result is:" $BUILDRES
+        exit 1
+    fi
     COVERPROF=cover/$PACKAGE.cover
     if [[ -f $TESTBIN ]]
     then

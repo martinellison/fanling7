@@ -26,9 +26,8 @@ func TestStore3(s Store, t *testing.T) {
 	ss := s.GetByFlagAndClear(0)
 	assert.Equal(0, len(ss))
 }
-func TestStore4(s Store, t *testing.T) {
+func TestStore4(s Store, ms Storable, t *testing.T) {
 	assert := assert.New(t)
-	ms := new(MockStorable)
 	s.Add(ms)
 	storable, found := s.Get("abc")
 	assert.True(found)

@@ -2,7 +2,6 @@ package pagestore
 
 import (
 	"itemset"
-	"persist"
 	"store"
 )
 
@@ -12,6 +11,11 @@ type PageStore struct {
 	flagged   []map[string]store.Storable
 }
 
+func MakePageStore(path string, freezer Freezer) *PageStore {
+	s := &PageStore{backStore: MakePersistentPageStore(path, freezer), flagged: make([]map[string]store.Storable, store.MaxFlag)}
+	s.items.Init()
+	return s
+}
 func (ps *PageStore) Add(storable store.Storable)     { ps.items.Add(storable); ps.backStore.Add(storable) }
 func (ps *PageStore) Changed(storable store.Storable) { ps.backStore.Changed(storable) }
 func (ps *PageStore) Get(ident string) (storable store.Storable, found bool) {
@@ -24,13 +28,10 @@ func (ps *PageStore) Get(ident string) (storable store.Storable, found bool) {
 	return
 }
 func (ps *PageStore) GetByIndex(indexNum int) []store.Storable {
-	ss := make([]store.Storable, 0)
+	ss := make([]store.Storable, store.MaxIndex)
 	return ss
 }
 func (ps *PageStore) Flag(flagNum int, storable store.Storable) {
-	if ps.flagged == nil {
-		ps.flagged = make([]map[string]store.Storable, 0)
-	}
 	m := ps.flagged[flagNum]
 	if m == nil {
 		m = make(map[string]store.Storable, 0)
@@ -41,22 +42,10 @@ func (ps *PageStore) Flag(flagNum int, storable store.Storable) {
 func (ps *PageStore) GetByFlagAndClear(flagNum int) map[string]store.Storable {
 	m := ps.flagged[flagNum]
 	if m == nil {
-		m = make(map[string]store.Storable, 0)
+		m = make(map[string]store.Storable, store.MaxFlag)
 		ps.flagged[flagNum] = m
 	}
 	ps.flagged[flagNum] = m
 	return m
 }
 func (ps *PageStore) Close() { ps.backStore.Close() }
-
-type PersistentPageStore struct {
-	persist.Persistor
-}
-
-func (ps *PersistentPageStore) Add(storable store.Storable)                             {}
-func (ps *PersistentPageStore) Changed(storable store.Storable)                         {}
-func (ps *PersistentPageStore) Get(ident string) (storable store.Storable, found bool)  { return }
-func (ps *PersistentPageStore) GetByIndex(indexNum int) []store.Storable                { return nil }
-func (ps *PersistentPageStore) Flag(flagNum int, storable store.Storable)               {}
-func (ps *PersistentPageStore) GetByFlagAndClear(flagNum int) map[string]store.Storable { return nil }
-func (ps *PersistentPageStore) Close()                                                  {}

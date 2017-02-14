@@ -1,68 +1,67 @@
 package pagestore
 
 import (
-	"filepersist"
+	"persist"
 	"store"
 	"testing"
 )
 
-func makeTestPersistentPageStore() *PersistentPageStore {
-	p := &filepersist.FilePersistor{}
-	p.Open("?")
-	s := &PersistentPageStore{Persistor: p}
-	return s
-}
-
 // `TestPersistentPageStore1` tests
 func TestPersistentPageStore1(t *testing.T) {
-	s := makeTestPersistentPageStore()
+	s := MakePersistentPageStore("abc", &MockFreezer{})
 	store.TestStore1(s, t)
 }
 
 // `TestPersistentPageStore2` tests
 func TestPersistentPageStore2(t *testing.T) {
-	s := makeTestPersistentPageStore()
+	s := MakePersistentPageStore("abc", &MockFreezer{})
 	store.TestStore2(s, t)
 }
 
 // `TestPersistentPageStore3` tests
 func TestPersistentPageStore3(t *testing.T) {
-	s := makeTestPersistentPageStore()
+	s := MakePersistentPageStore("abc", &MockFreezer{})
 	store.TestStore3(s, t)
 }
 
 // `TestPersistentPageStore4` tests
 func TestPersistentPageStore4(t *testing.T) {
-	s := makeTestPersistentPageStore()
-	store.TestStore4(s, t)
-}
-
-func makeTestPageStore() *PageStore {
-	s := &PageStore{backStore: makeTestPersistentPageStore()}
-	s.items.Init()
-	return s
+	s := MakePersistentPageStore("abc", &MockFreezer{})
+	store.TestStore4(s, &MockFreezable{}, t)
 }
 
 // `TestPageStore1` tests
 func TestPageStore1(t *testing.T) {
-	s := makeTestPageStore()
+	s := MakePageStore("abc", &MockFreezer{})
 	store.TestStore1(s, t)
 }
 
 // `TestPageStore2` tests
 func TestPageStore2(t *testing.T) {
-	s := makeTestPageStore()
+	s := MakePageStore("abc", &MockFreezer{})
 	store.TestStore2(s, t)
 }
 
 // `TestPageStore3` tests
 func TestPageStore3(t *testing.T) {
-	s := makeTestPageStore()
+	s := MakePageStore("abc", &MockFreezer{})
 	store.TestStore3(s, t)
 }
 
 // `TestPageStore4` tests
 func TestPageStore4(t *testing.T) {
-	s := makeTestPageStore()
-	store.TestStore4(s, t)
+	s := MakePageStore("abc", &MockFreezer{})
+	store.TestStore4(s, &MockFreezable{}, t)
+}
+
+type MockFreezer struct{}
+type MockFreezable struct{}
+
+func (mf *MockFreezable) Meta() persist.PageMeta       { return persist.PageMeta{} }
+func (mf *MockFreezable) Detail() []byte               { return []byte("xyz") }
+func (mf *MockFreezable) Ident() string                { return "abc" }
+func (mf *MockFreezable) IndexKey(indexNum int) string { return "jkl" }
+
+func (mf *MockFreezer) Freeze(meta persist.PageMeta, detail []byte) (f Freezable) {
+	return &MockFreezable{}
 }
